@@ -15,9 +15,6 @@ require_once __DIR__.'/../src/MP/Framework/AutoLoader.php';
 $classLoader = new \MP\Framework\AutoLoader(__DIR__.'/../src');
 $classLoader->register();
 
-// Composer autoloader
-require_once '../vendor/autoload.php';
-
 ////
 // Bootstrap the framework
 ////
