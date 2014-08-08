@@ -100,6 +100,7 @@ class App {
 
 	function handleDirectRoute($controller, $req, $response) {
 		$exception = null;
+
 		ob_start();
 
 		try {
@@ -109,6 +110,13 @@ class App {
 		}
 
 		$captured = ob_get_clean();
+
+		if ($exception) {
+			echo '<pre>';
+			var_dump($exception);
+			echo '</pre>';
+			exit;
+		}
 
 		if ($response->isEnded()) {
 			$response->flush();
@@ -176,6 +184,26 @@ class App {
 
 		list ($result, $captured, $exception) = $res;
 
+		// Don't try rendering a template if content type was application/json
+
+		if ($req->getContentType() == 'application/json') {
+			if ($exception) {
+				$send['exception'] = $exception->getMessage();
+				$send['captured'] = $captured;
+
+				$response->json($send);
+			} else if ($captured) {
+				$send['captured'] = $captured;
+
+				$response->json($send);
+			} else {
+				$response->json($result);
+			}
+			$response->flush();
+
+			return;
+		}
+
 		// Default template convention
 		// PROJECT_PREFIX/CONTROLLER/METHOD.php
 
@@ -195,8 +223,8 @@ class App {
 		//$response->flush()
 
 		// Render and flush, catching exceptions
-		$response = $this->render($response, $template, $result, $req);
-		$response->flush();
+		$resp = $this->render($response, $template, $result, $req);
+		$resp->flush();
 	}
 
 	function getController($controller_name)
