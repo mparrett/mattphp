@@ -19,11 +19,12 @@ class Stegano
     }
 
     /**
-      * Generate a scrambled version of the input ID using a Feistel Cipher
+      * Generate a scrambled version of the input ID 
+      * for a single Feistel Cipher round
       *
       * MySQL max for pid is 4294967295 (32 bits)
       */
-    public static function scrambleID($id, $rnd, $reverse = false)
+    private static function scrambleID($id, $rnd, $reverse = false)
     {
         $lo16mask = 0xffff;
         $hi16mask = 0xffff0000;
@@ -54,7 +55,7 @@ class Stegano
     {
         $out = $id;
         for ($i = 0, $len = count($kvals); $i < $len; $i++) {
-            $out = Stegano::scramblePid($out, $kvals[$i]);
+            $out = Stegano::scrambleID($out, $kvals[$i]);
         }
         return $out;
     }
@@ -68,7 +69,7 @@ class Stegano
     {
         $out = $id;
         for ($i = count($kvals) - 1; $i >= 0; $i--) {
-            $out = Stegano::scramblePid($out, $kvals[$i], true);
+            $out = Stegano::scrambleID($out, $kvals[$i], true);
         }
         return $out;
     }
@@ -106,4 +107,24 @@ class Stegano
         }
         return bindec($md5);
     }
+}
+
+// CLI tests / sample usage
+if (isset($argv) && $argc > 1) {
+    $rounds = [mt_rand(0, 16384), mt_rand(0, 16384), mt_rand(0, 16384), mt_rand(0, 16384)];
+    $rnd_id = mt_rand();
+
+    //$kvals = [1,2,3,4];
+    echo "ID:\t\t $rnd_id\n";
+    echo "Rounds:\t\t " . join(",", $rounds) . "\n";
+    
+    $scrambled = Stegano::scramble($rnd_id, $rounds);
+    echo "Scrambled:\t $scrambled\n";
+    $hidden = Stegano::disguiseLikeMD5($scrambled);
+    echo "Hidden:\t\t $hidden\n";
+    $recovered = Stegano::recoverFromMD5($hidden);
+    echo "Recovered:\t $recovered\n";
+    echo "Unscrambled:\t " . Stegano::unscramble($recovered, $rounds) . "\n";
+    assert($scrambled == $recovered);
+    echo "Done!\n";
 }
