@@ -12,7 +12,9 @@
     </div>
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-        <li <?php if ($_req->path == '/') { ?>class="active"><?php } ?><a href="#">About</a></li>
+        <li <?php if ($_req->path == '/') {
+    ?>class="active"><?php 
+} ?><a href="#">About</a></li>
         <li><a href="#contact">Learn More</a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">User <b class="caret"></b></a>

@@ -1,5 +1,5 @@
 <?php
-	$trace_arr = isset($ex) ? $ex->getTrace() : array();
+    $trace_arr = isset($ex) ? $ex->getTrace() : array();
 ?>
 <div class="panel panel-danger text-left">
 	<div class="panel-heading"><strong>Uncaught Exception</strong></div>
@@ -16,7 +16,8 @@
 				</tr>
 			</thead>
 			<tbody>
-				<?php foreach($trace_arr as $idx => $trace) { ?>
+				<?php foreach ($trace_arr as $idx => $trace) {
+    ?>
 				<tr>
 					<td>
 						<?=$idx?>
@@ -28,13 +29,16 @@
 					</td>
 					<td>
 						<code>
-							<?php if (isset($trace['file'])) { ?>
+							<?php if (isset($trace['file'])) {
+        ?>
 								<?=$trace['file']?> (<?=$trace['line']?>)
-							<?php } ?>
+							<?php 
+    } ?>
 						</code>
 					</td>
 				</tr>
-				<?php } ?>
+				<?php 
+} ?>
 			</tbody>
 		</table>
 	</div>

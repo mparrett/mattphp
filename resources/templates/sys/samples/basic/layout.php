@@ -32,17 +32,17 @@
 	<div class="container">
 		<div class="starter-template">
 			<?php
-			  if (isset($_exception) && strlen($_exception) > 0) {
-				$vars = array('ex'=>$_exception);
-				echo $this->render('sys/php-exception.php', $vars);
-			  }
-			?>
+              if (isset($_exception) && strlen($_exception) > 0) {
+                  $vars = array('ex'=>$_exception);
+                  echo $this->render('sys/php-exception.php', $vars);
+              }
+            ?>
 			<?php
-			  if (isset($_captured) && strlen($_captured) > 0) {
-				$vars = array('captured'=>$_captured);
-				echo $this->render('sys/php-captured-output.php', $vars);
-			  }
-			?>
+              if (isset($_captured) && strlen($_captured) > 0) {
+                  $vars = array('captured'=>$_captured);
+                  echo $this->render('sys/php-captured-output.php', $vars);
+              }
+            ?>
 
 			<?php echo $_child; ?>
 		</div>

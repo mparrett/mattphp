@@ -1,5 +1,5 @@
 <?php
-	$_extends = 'samples/basic/layout.php';
+    $_extends = 'samples/basic/layout.php';
 ?>
     <div class="container">
 

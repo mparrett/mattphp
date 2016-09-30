@@ -15,4 +15,3 @@ $classLoader = new MP\Framework\AutoLoader(__DIR__.'/../src');
 $classLoader->register();
 
 $di = new \MP\Framework\DI();
-

@@ -7,175 +7,182 @@ namespace MP\Framework;
 ////
 class ErrorHandler
 {
-	const RENDER_MODE_HTML_BASIC    = 'basic';
-	const RENDER_MODE_HTML_PRETTY   = 'pretty';
-	const RENDER_MODE_JSON          = 'json';
-	const RENDER_MODE_JSON_MESSAGES = 'json_messages';
+    const RENDER_MODE_HTML_BASIC    = 'basic';
+    const RENDER_MODE_HTML_PRETTY   = 'pretty';
+    const RENDER_MODE_JSON          = 'json';
+    const RENDER_MODE_JSON_MESSAGES = 'json_messages';
 
-	var $types_as_string = array(
-		1 => 'E_ERROR',
-		2 => 'E_WARNING',
-		4 => 'E_PARSE',
-		8 => 'E_NOTICE',
-		16 => 'E_CORE_ERROR',
-		32 => 'E_CORE_WARNING',
-		64 => 'E_COMPILE_ERROR',
-		128 => 'E_COMPILE_WARNING',
-		256 => 'E_USER_ERROR',
-		512 => 'E_USER_WARNING',
-		1024 => 'E_USER_NOTICE',
-		2048 => 'E_STRICT',
-		4096 => 'E_RECOVERABLE_ERROR',
-		8192 => 'E_DEPRECATED'
-	);
+    public $types_as_string = array(
+        1 => 'E_ERROR',
+        2 => 'E_WARNING',
+        4 => 'E_PARSE',
+        8 => 'E_NOTICE',
+        16 => 'E_CORE_ERROR',
+        32 => 'E_CORE_WARNING',
+        64 => 'E_COMPILE_ERROR',
+        128 => 'E_COMPILE_WARNING',
+        256 => 'E_USER_ERROR',
+        512 => 'E_USER_WARNING',
+        1024 => 'E_USER_NOTICE',
+        2048 => 'E_STRICT',
+        4096 => 'E_RECOVERABLE_ERROR',
+        8192 => 'E_DEPRECATED'
+    );
 
-	var $errors = array();
-	var $render_mode = 'pretty';
+    public $errors = array();
+    public $render_mode = 'pretty';
 
-	function handler() {
-		// "It is important to remember that the standard PHP error handler is
-		// completely bypassed for the error types specified by error_types
-		// unless the callback function returns FALSE"
+    public function handler()
+    {
+        // "It is important to remember that the standard PHP error handler is
+        // completely bypassed for the error types specified by error_types
+        // unless the callback function returns FALSE"
 
-		// "The following error types cannot be handled with a user defined
-		// function: E_ERROR, E_PARSE, E_CORE_ERROR, E_CORE_WARNING,
-		// E_COMPILE_ERROR, E_COMPILE_WARNING, and most of E_STRICT raised in
-		// the file where set_error_handler() is called."
+        // "The following error types cannot be handled with a user defined
+        // function: E_ERROR, E_PARSE, E_CORE_ERROR, E_CORE_WARNING,
+        // E_COMPILE_ERROR, E_COMPILE_WARNING, and most of E_STRICT raised in
+        // the file where set_error_handler() is called."
 
-		// TODO: throw new ErrorException for backtrace?
+        // TODO: throw new ErrorException for backtrace?
 
-		$args = func_get_args();
+        $args = func_get_args();
 
-		$err = array(
-			'type' => $args[0],
-			'message' => $args[1],
-			'file' => $args[2],
-			'line' => $args[3],
-			'context' => $args[4]
-		);
+        $err = array(
+            'type' => $args[0],
+            'message' => $args[1],
+            'file' => $args[2],
+            'line' => $args[3],
+            'context' => $args[4]
+        );
 
-		$this->errors[] = $err;
-	}
+        $this->errors[] = $err;
+    }
 
-	function shutdown() {
+    public function shutdown()
+    {
 
-		// Check for any final fatal errors
-		$e = error_get_last();
+        // Check for any final fatal errors
+        $e = error_get_last();
 
-		if (null !== $e) {
-			$this->errors[] = $e;
-		}
+        if (null !== $e) {
+            $this->errors[] = $e;
+        }
 
-		if (count($this->errors) > 0) {
-			header("HTTP/1.1 500 Internal Server Error");
-			header("Content-type: text/html", true, 500);
-			die($this->get_response_body());
-		}
-	}
+        if (count($this->errors) > 0) {
+            header("HTTP/1.1 500 Internal Server Error");
+            header("Content-type: text/html", true, 500);
+            die($this->get_response_body());
+        }
+    }
 
-	function get_response_body() {
-		return $this->render_all_errors($this->errors);
-	}
+    public function get_response_body()
+    {
+        return $this->render_all_errors($this->errors);
+    }
 
-	function render_all_errors($errors) {
+    public function render_all_errors($errors)
+    {
+        if (static::RENDER_MODE_JSON_MESSAGES === $this->render_mode) {
+            $messages = array();
+            foreach ($errors as $error) {
+                $messages[] = $error['type'] . ', '. $error['file'] . ":" . $error['line'] . " " . $error['message'];
+            }
 
-		if (static::RENDER_MODE_JSON_MESSAGES === $this->render_mode) {
+            return json_encode($messages);
+        }
 
-			$messages = array();
-			foreach ($errors as $error) {
-				$messages[] = $error['type'] . ', '. $error['file'] . ":" . $error['line'] . " " . $error['message'];
-			}
+        if (static::RENDER_MODE_HTML_PRETTY === $this->render_mode) {
+            $out = $this->render_errors_pretty($errors);
+        } else {
+            $out = '';
+            foreach ($errors as $error) {
+                $out .= $this->render_error($error);
+            }
+        }
+        return $out;
+    }
 
-			return json_encode($messages);
-		}
+    public function render_error($err)
+    {
+        if ($this->render_mode == static::RENDER_MODE_HTML_BASIC) {
+            return $this->render_error_basic($err);
+        } elseif ($this->render_mode == static::RENDER_MODE_HTML_PRETTY) {
+            return $this->render_error_pretty($err);
+        } elseif ($this->render_mode == static::RENDER_MODE_JSON) {
+            return $this->render_error_json($err);
+        } else {
+            return 'error';
+        }
+    }
 
-		if (static::RENDER_MODE_HTML_PRETTY === $this->render_mode) {
-			$out = $this->render_errors_pretty($errors);
-		} else {
+    public function render_error_basic($err)
+    {
+        unset($err['context']); // it's too big
+        return '<pre>' . print_r($err, true) . '</pre>';
+    }
 
-			$out = '';
-			foreach ($errors as $error) {
-				$out .= $this->render_error($error);
-			}
-		}
-		return $out;
-	}
+    public function render_error_json($error)
+    {
+        unset($err['context']); // it's too big
+        return json_encode(array('error' => $error));
+    }
 
-	function render_error($err) {
-		if ($this->render_mode == static::RENDER_MODE_HTML_BASIC) {
-			return $this->render_error_basic($err);
-		} else if ($this->render_mode == static::RENDER_MODE_HTML_PRETTY) {
-			return $this->render_error_pretty($err);
-		} else if ($this->render_mode == static::RENDER_MODE_JSON) {
-			return $this->render_error_json($err);
-		} else {
-			return 'error';
-		}
-	}
+    public function render_line($line)
+    {
+        return trim(str_replace(" ", '&nbsp;', $line));
+    }
 
-	function render_error_basic($err) {
-		unset($err['context']); // it's too big
-		return '<pre>' . print_r($err, true) . '</pre>';
-	}
+    public function render_error_pretty($error)
+    {
+        $file = file($error['file']);
 
-	function render_error_json($error) {
-		unset($err['context']); // it's too big
-		return json_encode(array('error' => $error));
-	}
+        $pre_context_lines = 3;
+        $post_context_lines = 3;
 
-	function render_line($line) {
-		return trim(str_replace(" ", '&nbsp;', $line));
-	}
+        $context = array_splice(
+            $file,
+            $error['line'] - $pre_context_lines,
+            $pre_context_lines + $post_context_lines + 1
+        );
 
-	function render_error_pretty($error) {
-		$file = file($error['file']);
+        foreach ($context as $i => &$line) {
+            $line_num = $error['line'] - $pre_context_lines + $i + 1;
 
-		$pre_context_lines = 3;
-		$post_context_lines = 3;
+            if ($line_num == $error['line']) {
+                $line = '<span class="err_line hl">' . $line_num . ' ' . $this->render_line($line) . '</span></span>';
+            } else {
+                $line = '<span class="err_line mute">' . $line_num . '</span>  ' . $this->render_line($line);
+            }
+        }
 
-		$context = array_splice(
-			$file,
-			$error['line'] - $pre_context_lines,
-			$pre_context_lines + $post_context_lines + 1
-		);
+        $frag = '<div><span class="type">%s</span><h2>%s</h2><span>%s  %s</span><br /><br />%s';
 
-		foreach ($context as $i => &$line) {
-			$line_num = $error['line'] - $pre_context_lines + $i + 1;
+        $base = basename($error['file']);
+        $disp_file = '<span class="mute">' .
+                    str_replace($base, '<span class="file">' . $base . '</span>', $error['file'])
+                    . '</span>';
 
-			if ($line_num == $error['line']) {
-				$line = '<span class="err_line hl">' . $line_num . ' ' . $this->render_line($line) . '</span></span>';
-			} else {
-				$line = '<span class="err_line mute">' . $line_num . '</span>  ' . $this->render_line($line);
-			}
-		}
+        $out = sprintf(
+            $frag,
+            $this->types_as_string[$error['type']],
+            $error['message'],
+            $error['line'],
+            $disp_file,
+            implode("<br />\n", $context)
+        );
+        $out .= '</div>';
 
-		$frag = '<div><span class="type">%s</span><h2>%s</h2><span>%s  %s</span><br /><br />%s';
+        return $out;
+    }
 
-		$base = basename($error['file']);
-		$disp_file = '<span class="mute">' .
-					str_replace($base, '<span class="file">' . $base . '</span>', $error['file'])
-					. '</span>';
+    public function render_errors_pretty($errors)
+    {
+        $out = '';
+        foreach ($errors as $error) {
+            $out .= $this->render_error_pretty($error);
+        }
 
-		$out = sprintf(
-			$frag,
-			$this->types_as_string[$error['type']],
-			$error['message'],
-			$error['line'],
-			$disp_file,
-			implode("<br />\n", $context)
-		);
-		$out .= '</div>';
-
-		return $out;
-	}
-
-	function render_errors_pretty($errors) {
-		$out = '';
-		foreach($errors as $error) {
-		   $out .= $this->render_error_pretty($error);
-		}
-
-		$body = <<<EOT
+        $body = <<<EOT
 <style type="text/css">
 
 .hl {
@@ -228,6 +235,6 @@ h2 {
 	%s
 </div>
 EOT;
-		return sprintf($body, $out);
-	}
+        return sprintf($body, $out);
+    }
 }

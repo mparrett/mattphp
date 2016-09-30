@@ -33,7 +33,7 @@
 
     <?php
       if (isset($_captured) && strlen($_captured) > 0) {
-        echo '<div class="container"><pre>'.$_captured.'</pre></div>';
+          echo '<div class="container"><pre>'.$_captured.'</pre></div>';
       }
     ?>
 
