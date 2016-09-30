@@ -2,6 +2,9 @@
 
 namespace MP\Framework;
 
+/**
+ * Validate GET/POST request arguments
+ */
 class Validator
 {
     public $request;

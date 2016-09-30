@@ -1,9 +1,11 @@
 <?php
 
-// Inspired by RafalFilipek's wrapper
-
 namespace MP\Framework;
 
+/**
+ * Inspired by RafalFilipek's wrapper
+ * Wraps a memcached instance and provides a few helpful methods
+ */
 class MemcachedWrapper
 {
     protected $memcached;
@@ -13,7 +15,9 @@ class MemcachedWrapper
         $this->memcached = $memcache;
     }
 
-    // Get an item, or fallback (and set)
+    /**
+     * Get an item, or fallback (and set)
+     */
     public function get($key, $fallback = null, $expiration = 0)
     {
         $result = $this->memcached->get($key);

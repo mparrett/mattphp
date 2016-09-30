@@ -2,6 +2,10 @@
 
 namespace MP\Framework;
 
+/**
+ * Simple Autoloader for MattPHP
+ * @author Matt Parrett
+ */
 class AutoLoader
 {
     private $includePath;
@@ -11,6 +15,9 @@ class AutoLoader
         $this->includePath = $includePath;
     }
 
+    /**
+     * SPL Autoload handler
+     */
     public function loadOptionalClass($className)
     {
         $fileName = '';

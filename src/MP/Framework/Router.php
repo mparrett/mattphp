@@ -1,7 +1,10 @@
 <?php
 
-// Stolen from React\Gifsocket;
-
+/**
+ * MattPHP
+ * Dead-simple router
+ * Inspired by React\Gifsocket;
+ */
 namespace MP\Framework;
 
 class Router

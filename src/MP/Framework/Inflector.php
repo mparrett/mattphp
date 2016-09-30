@@ -2,8 +2,11 @@
 
 namespace MP\Framework;
 
-// Stolen from Symfony2
-
+/**
+ * MattPHP inflector
+ * Stolen from Symfony2, slightly modified
+ * TODO: Make compatiable with Symfony2 and properly depend on it
+ */
 class Inflector
 {
     public static function singularize($word)

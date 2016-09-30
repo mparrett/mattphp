@@ -2,6 +2,10 @@
 
 namespace MP\Framework;
 
+/**
+ * The base Controller class for MattPHP
+ * @author Matt Parrett
+ */
 class Controller
 {
     protected $request;
@@ -10,18 +14,21 @@ class Controller
 
     public function _init(&$req = null, &$response = null, &$di = null)
     {
-        // XXX: Should this just have access to the App?
         if ($req !== null) {
             $this->request = $req;
         }
         if ($response !== null) {
             $this->response = $response;
         }
+        // Dependency injection
         if ($di !== null) {
             $this->di = $di;
         }
     }
 
+    /**
+     * Response handler for 404
+     */
     public function notFound()
     {
         $t = $this->di->get('templates');

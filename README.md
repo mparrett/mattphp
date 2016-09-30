@@ -1,6 +1,6 @@
 # MattPHP
 
-My little web framework. Hopefully the last one I ever need to write for PHP.
+My little toy web framework. Hopefully the last one I ever feel compelled to write for PHP.
 
 ## Versioning
 

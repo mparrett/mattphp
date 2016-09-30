@@ -1,24 +1,22 @@
 <?php
 
-// Inspired by from Zend Framework
-
 namespace MP\Framework;
 
 /**
  * Bcrypt algorithm using crypt() function of PHP
+ * Ripped from Zend Framework and modified
  */
 class Bcrypt
 {
+    protected $cost;
+    protected $salt;
+    
     /**
-     * @var string
-     *
+     * @param  string $salt
      * Changed from 14 to 10 to prevent possibile DOS attacks
      * due to the high computational time
      * @see http://timoh6.github.io/2013/11/26/Aggressive-password-stretching.html
      */
-    protected $cost;
-    protected $salt;
-
     public function __construct($salt = null, $cost = 10)
     {
         if ($salt === null) {
@@ -40,7 +38,7 @@ class Bcrypt
     }
 
     /**
-     * Bcrypt
+     * Bcrypt encrypt a password
      *
      * @param  string $password
      * @throws Exception\RuntimeException
@@ -86,6 +84,9 @@ class Bcrypt
         return $this->cost;
     }
 
+    /**
+     * Get a random salt of specified length
+     */
     public static function getRandomSalt($size = 16)
     {
         $ret = openssl_random_pseudo_bytes($size, $strong);

@@ -2,6 +2,9 @@
 
 namespace MP\Framework;
 
+/**
+ * Models a HTTP response
+ */
 class Response
 {
     protected $proto   = 'HTTP/1.1';

@@ -2,6 +2,10 @@
 
 namespace MP\Framework;
 
+/**
+ * Represents the web application at the top level
+ * @author Matt Parrett
+ */
 class App
 {
     public $di;
@@ -13,15 +17,19 @@ class App
         $this->di = $di;
     }
 
+    /**
+     * Get the application config with default values
+     * Memoized
+     */
     public function getConfig($key = null)
     {
         if (!$this->config) {
             $config = $this->di->get('app_config');
 
             $config = array_replace([
-                    'default_template'            => 'sys/index.php',
+                    'default_template'          => 'sys/index.php',
                     'not_found_template'        => 'sys/404-not-found.php',
-                    'app_controller_namespace'    => '\\',
+                    'app_controller_namespace'  => '\\',
                     'project_prefix'            => ''
                 ],
                 $config
@@ -37,13 +45,17 @@ class App
         return $this->config;
     }
 
-    // Add a "before" middleware to run before the request is processed
+    /**
+     * Adds a "before" middleware to run before the request is processed
+     */
     public function before($f)
     {
         $this->befores[] = $f;
     }
 
-    // Route a callable or controller/method via regex
+    /**
+     * Route a callable or controller/method via regex
+     */
     public function route($route, $f, $method = '*')
     {
         if ($method === '*') {
@@ -57,6 +69,9 @@ class App
         }
     }
 
+    /**
+     * Matches a handler for a request by matching the route
+     */
     public function getHandler($req)
     {
         if (!isset($this->routes[$req->getMethod()])) {
@@ -140,7 +155,9 @@ class App
         $response->flush();
     }
 
-    // Get a CakePHP-style automatic route
+    /**
+     * Get a CakePHP-style automatic route
+     */
     public function getAutoRoute($req)
     {
         // Default to index controller
@@ -152,10 +169,9 @@ class App
         return array($controller_name, $method);
     }
 
-    ////
-    // Process and flush the request/response pair
-    ////
-
+    /**
+     * Process and flush the request/response pair
+     */
     public function handle(&$req, &$response = null)
     {
         // Run "before" middlewares
@@ -181,7 +197,7 @@ class App
             list($controller_name, $method) = $this->getAutoRoute($req);
         }
 
-        // Get it
+        // Handle controller not found
         $controller = $this->getController($controller_name);
         if ($controller === false) {
             $this->render($response, $this->getConfig('not_found_template'), null, $req);
@@ -189,6 +205,7 @@ class App
             return;
         }
 
+        // Process request
         $res = $this->process($controller, $method, $req, $response);
 
         if ($res === null) {
@@ -244,6 +261,9 @@ class App
         $resp->flush();
     }
 
+    /**
+     * Factory for Controller, by controller name
+     */
     public function getController($controller_name)
     {
         $controller_class = $this->getConfig('app_controller_namespace').
@@ -257,10 +277,12 @@ class App
         return new $controller_class();
     }
 
-    // Process a request with a specific controller/method combo
-    // Returns null if response was rendered/flushed
-    // This can happen if the method was not found
-    // Or if the controller had a custom response/override
+    /**
+     * Process a request with a specific controller/method combo
+     * Returns null if response was rendered/flushed
+     * This can happen if the method was not found
+     * Or if the controller had a custom response/override
+     */
     public function process($controller, $method, $req, $response)
     {
         // Method not found
@@ -289,6 +311,7 @@ class App
                 // XXX: Untested, may remove
                 // XXX: Hack for CakePHP-style path argument injection
                 // Would be better to use reflection or some such to verify number of arguments
+                // Note: Modern PHP supports variadic arguments
                 //$func_args = array_slice($req->path_args, 1);
                 //$func_args = array_merge($func_args, array(null, null, null, null, null));
 
@@ -314,9 +337,11 @@ class App
         return array($result, $captured, $exception);
     }
 
-    // Attempt to render a template for a given response
-    // If the template is not found or there is an exceptoin
-    // Display something nice
+    /**
+     * Attempt to render a template for a given response
+     * If the template is not found or there is an exception,
+     * display something nice
+     */
     public function render(&$response, $template, $vars, $req, $code = 200)
     {
         $templates = $this->di->get('templates');
@@ -343,7 +368,9 @@ class App
         return $response;
     }
 
-    // Add some debug info to a result, for displaying in the dev template
+    /**
+     * Add some debug info to a result, for displaying in the dev template
+     */
     public function addDebugInfo(&$result, $captured, $exception)
     {
         if ($result === null) {
@@ -363,12 +390,11 @@ class App
         }
     }
 
+    /**
+     * Register error handling (dev only)
+     */
     public function registerCustomErrorHandler()
     {
-        ////
-        // Error handling (dev only)
-        ////
-
         $err_handler = new \MP\Framework\ErrorHandler();
 
         error_reporting(E_ALL | E_STRICT);

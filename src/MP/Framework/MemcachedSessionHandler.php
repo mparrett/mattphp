@@ -1,9 +1,11 @@
 <?php
 
-// Stolen from Symfony2
-
 namespace MP\Framework;
 
+/**
+ * Inspired by Symfony2
+ * TODO: Use Symfony2's handler directly
+ */
 class MemcachedSessionHandler implements \SessionHandlerInterface
 {
     private $memcached;

@@ -2,10 +2,11 @@
 
 namespace MP\Framework;
 
-////
-// Simple template rendering
-////
-
+/**
+ * MattPHP
+ * Simple CakePHP-style template rendering
+ * @author Matt Parrett
+ */
 class Templates
 {
     public $app;
@@ -25,9 +26,11 @@ class Templates
         return $this->template_dir . '/' . $template;
     }
 
-    // Render a single template
-    // Extracting $vars into the symbol table before
-    // inclusion
+    /**
+     * Render a single template
+     * Extracting $vars into the symbol table before
+     * inclusion
+     */
     public function renderSingle($template, $_vars)
     {
         if (!file_exists($template)) {
@@ -56,7 +59,9 @@ class Templates
         return $ret; // Return contents and template to extend
     }
 
-    // Render a (possible) chain of templates
+    /**
+     * Render a (possible) chain of templates
+     */
     public function render($template, &$_vars = array())
     {
         if (isset($_vars['_extends'])) {
@@ -107,9 +112,17 @@ class Templates
         throw new \Exception("Templates::render - SHOULD NOT GET HERE");
     }
 
-    ////
-    // Caching
-    ////
+    /**
+     * Check if the template exists
+     */
+    public function exists($template)
+    {
+        return file_exists($this->getTemplatePath($template));
+    }
+    
+    /**
+     * Cache a template by writing it to a file
+     */
     public function cache($template, $output)
     {
         file_put_contents($this->getTemplatePath($template), $output);
@@ -127,10 +140,5 @@ class Templates
         }
 
         return $key;
-    }
-
-    public function exists($template)
-    {
-        return file_exists($this->getTemplatePath($template));
     }
 }

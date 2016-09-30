@@ -2,9 +2,9 @@
 
 namespace MP\Framework;
 
-////
-// Custom error handler inspired by PHP_Error
-////
+/**
+ * Custom visual error handler inspired by PHP_Error
+ */
 class ErrorHandler
 {
     const RENDER_MODE_HTML_BASIC    = 'basic';

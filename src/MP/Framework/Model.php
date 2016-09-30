@@ -2,6 +2,12 @@
 
 namespace MP\Framework;
 
+/**
+ * MattPHP
+ * Basic data model/container. Each object corresponds with a database row.
+ * Tracks whether an object is dirty and needs to be saved. Performs insert/update.
+ * @author Matt Parrett
+ */
 class Model
 {
     public $fields = array();
@@ -59,9 +65,9 @@ class Model
         return $this->fields;
     }
 
-    ////
-    // Load from DB
-    ////
+    /**
+     * Load from DB
+     */
     public function load($primary, $fields = '*')
     {
         $q = "SELECT $fields FROM ".$this->table." WHERE ".
@@ -76,9 +82,9 @@ class Model
         return true;
     }
 
-    ////
-    // Save to DB (upsert)
-    ////
+    /**
+     * Save to DB (upsert)
+     */
     public function save()
     {
         if (empty($this->dirty)) {
@@ -97,9 +103,9 @@ class Model
         }
     }
 
-    ////
-    // Delete from DB
-    ////
+    /**
+     * Delete from DB
+     */
     public function delete()
     {
         $this->db->delete($this->table, $this->primary, $this->{$this->primary});

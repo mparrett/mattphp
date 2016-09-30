@@ -2,10 +2,11 @@
 
 namespace MP\Framework;
 
-////
-// Simple MySQL DB Wrapper and Abstraction
-////
-
+/**
+ * MattPHP
+ * Simple MySQL DB Wrapper and Abstraction
+ * @author Matt Parrett
+ */
 class DB
 {
     public $mysqli;
@@ -42,6 +43,9 @@ class DB
     }
     */
 
+    /**
+     * Connect to the MySQL Database
+     */
     public function connect()
     {
         if ($this->use_compression) {
@@ -62,6 +66,9 @@ class DB
         return true;
     }
 
+    /**
+     * Reference values workaround for old versions of PHP
+     */
     private function refValues($arr)
     {
         $refs = array();
@@ -71,6 +78,9 @@ class DB
         return $refs;
     }
 
+    /**
+     * Create a prepared statement
+     */
     public function prep_stmt($sql, $types = null, $params = null)
     {
         $stmt = $this->mysqli->prepare($sql);
@@ -97,6 +107,9 @@ class DB
         return $stmt;
     }
 
+    /**
+     * Execute a query via prepared statement
+     */
     public function exec_stmt($sql, $types = null, $params = null)
     {
         $stmt = $this->prep_stmt($sql, $types, $params);
@@ -115,6 +128,9 @@ class DB
         return $affected_rows;
     }
 
+    /**
+     * Query a single field from a single row
+     */
     public function query_field($q)
     {
         $result = $this->mysqli->query($q);
@@ -129,6 +145,9 @@ class DB
         return isset($row[0]) ? $row[0] : null;
     }
 
+    /**
+     * Query one row
+     */
     public function queryOne($q, $resulttype = MYSQLI_ASSOC)
     {
         $result = $this->mysqli->query($q);
@@ -143,6 +162,9 @@ class DB
         return $row;
     }
 
+    /**
+     * Query all rows, with MySQL Native Driver result typing
+     */
     public function query_all_typed($q, $resulttype = MYSQLI_ASSOC)
     {
         $stmt = $this->mysqli->prepare($q);
@@ -163,6 +185,7 @@ class DB
         $result = $this->mysqli->query($q);
 
         /*
+         * mysqli_query NOTE:
          * Returns FALSE on failure.
          * For successful SELECT, SHOW, DESCRIBE or EXPLAIN queries
          * mysqli_query() will return a mysqli_result object. For other successful queries
@@ -186,6 +209,9 @@ class DB
         return $result->fetch_all($resulttype);
     }
 
+    /**
+     * Query and return filtered results using callable $f
+     */
     public function filter($q, $f, $resulttype = MYSQLI_ASSOC)
     {
         $result = $this->mysqli->query($q);
@@ -205,6 +231,9 @@ class DB
         return $out;
     }
 
+    /**
+     * Query and map rows using callable $f
+     */
     public function map($q, $f, $resulttype = MYSQLI_ASSOC)
     {
         $result = $this->mysqli->query($q);
@@ -222,6 +251,9 @@ class DB
         return $out;
     }
 
+    /**
+     * Query and reduce rows using callable $f
+     */
     public function reduce($q, $f, $initial = null, $resulttype = MYSQLI_ASSOC)
     {
         $result = $this->mysqli->query($q);
@@ -240,21 +272,33 @@ class DB
         return $carry;
     }
 
+    /**
+     * Delete one row from the database
+     */
     public function deleteOne($table, $primary_key, $val)
     {
         $this->exec_stmt("DELETE FROM `".$table."` WHERE `".$primary_key."` = ? LIMIT 1", 'i', array($val));
     }
 
+    /**
+     * Truncate table
+     */
     public function truncate($table)
     {
         $this->exec_stmt("TRUNCATE TABLE `".$table."`");
     }
 
+    /**
+     * Escape field name
+     */
     public function escapeField($field)
     {
         return "`".$this->escape($field)."`";
     }
 
+    /**
+     * Properly escape value using quotes or no quotes if digit/NULL
+     */
     public function escapeValue($val)
     {
         if (null === $val) {
@@ -268,11 +312,17 @@ class DB
         }
     }
 
+    /**
+     * Raw MySQLi escape
+     */
     public function escape($value)
     {
         return $this->mysqli->real_escape_string($value);
     }
 
+    /**
+     * Build insert statement from a key/val array
+     */
     public function buildInsert($table, $data, $primary = 'id')
     {
         // Seperate keys and values
@@ -319,6 +369,9 @@ class DB
         return $this->mysqli->close();
     }
 
+    /**
+     * Get last insert ID
+     */
     public function insertId()
     {
         // If the last query wasn't an INSERT or UPDATE statement or if the modified

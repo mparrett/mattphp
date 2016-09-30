@@ -3,10 +3,12 @@
 
 namespace MP\Framework;
 
-/*
-* Basically a typed collection of $className
-*/
-
+/**
+ * Matt PHP
+ * Collection of Models.
+ * In other words, a typed collection of $className
+ * @author Matt Parrett
+ */
 class ModelCollection implements ArrayAccess, Iterator, Countable
 {
     private $instances = array();

@@ -2,10 +2,20 @@
 
 namespace MP\Framework;
 
+/**
+ * MattPHP
+ * Dependency Injection Container
+ * In this framework, primarily enables lazy-loading and initialization
+ * of intertwined dependencies
+ * @author Matt Parrett
+ */
 class DI
 {
     public $refs = array();
 
+    /**
+     * Initializes a factory at $name
+     */
     public function set_factory($name, $ref)
     {
         if (isset($this->refs[$name])) {
@@ -15,6 +25,9 @@ class DI
         $this->refs[$name] = array($ref, true);
     }
 
+    /**
+     * Initializes a singleton/value at $name
+     */
     public function set($name, $ref)
     {
         if (isset($this->refs[$name])) {
@@ -24,6 +37,9 @@ class DI
         $this->refs[$name] = array($ref, false);
     }
 
+    /**
+     * Gets dependency at $name
+     */
     public function get($name)
     {
         if (!isset($this->refs[$name])) {

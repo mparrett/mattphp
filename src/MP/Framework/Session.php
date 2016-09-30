@@ -2,6 +2,10 @@
 
 namespace MP\Framework;
 
+/**
+ * Models a user session. Wraps PHP $_SESSION superglobal operations.
+ * MongoDB-friendly
+ */
 class Session
 {
     public $fields = array();
@@ -49,6 +53,9 @@ class Session
         $_SESSION = array_slice($_SESSION, $offset, 1);
     }
 
+    /**
+     * Configure and start the session
+     */
     public function start()
     {
         if ($this->started === false) {

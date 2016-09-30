@@ -2,10 +2,11 @@
 
 namespace MP\Framework;
 
-////
-// Simple Request
-////
-
+/**
+ * Matt PHP
+ * Models a web request
+ * @author Matt Parrett
+ */
 class Request
 {
     public $path;
@@ -43,6 +44,9 @@ class Request
         return $this->method;
     }
 
+    /**
+     * Initializes the request from a URI string
+     */
     public function initializeFromURI($uri)
     {
         $parsed = parse_url($uri);
@@ -72,14 +76,17 @@ class Request
         return $req;
     }
 
-    // THis is the preferred method of initialization
+    /**
+     * Initialize state from server globals
+     * Preferred method of initialization
+     */
     public static function createFromGlobals()
     {
         $req = new Request();
 
-        $req->query_args    = $_GET;
-        $req->post            = $_POST;
-        $req->cookie        = $_COOKIE;
+        $req->query_args     = $_GET;
+        $req->post           = $_POST;
+        $req->cookie         = $_COOKIE;
         $req->request        = $_REQUEST;
 
         if (isset($_SERVER['REQUEST_METHOD'])) {
@@ -94,6 +101,9 @@ class Request
         return $req;
     }
 
+    /**
+     * Gets raw request content
+     */
     public function getContent()
     {
         return file_get_contents("php://input");
@@ -106,6 +116,9 @@ class Request
         }
     }
 
+    /**
+     * Provides getallheaders function which may be missing
+     */
     public function getallheaders()
     {
         if (function_exists('getallheaders')) {

@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Work in progress. Proxy object that allows injection of before/after callbacks
+ */
 class Proxy
 {
     private $object;
